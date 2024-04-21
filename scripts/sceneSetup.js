@@ -6,6 +6,7 @@ import { PLYLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/
 const scene = new THREE.Scene();
 let camera, renderer;
 const viewerElement = document.getElementById('viewer');
+const sceneElement = document.getElementById('scene-select').value;
 
 function setupScene() {
     scene.background = new THREE.Color(0xaaaaaa);
@@ -61,10 +62,14 @@ function initScene() {
 
 function loadPLY() {
     const loader = new PLYLoader();
+    let path;
+    if (sceneElement === 'scene1') {
+        path = './model/spiralStairs.ply';
+    }
     
     loader.load(
 
-        './model/spiralStairs.ply',
+        path,
         
         (geometry) => {
             geometry.computeVertexNormals();
