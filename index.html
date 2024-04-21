@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shap-Explorer 1.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    
+    <!-- <h1>Shap-Explorer</h1> -->
+    <div id="toolbar">
+        <div id="previewer" clas = 'module'></div>
+        <div id = "shapE", class="module">
+            <h2>Shap-E Generating</h2>
+            <textarea id="prompt-text" rows="1" cols="50">a chair</textarea>
+
+            <label for="myRange">Guidance scale:</label>
+            <span id="guidance-scale-rangeValue" type = "number">16</span>
+                <script>
+                function updateGuidanceScale(value) {
+                    document.getElementById('guidance-scale-rangeValue').textContent = value;
+                }
+                </script>
+            <input type="range" id="guidance-scale" name="range" min="0" max="100" step="1" value= "16"oninput="updateGuidanceScale(this.value)">
+            
+
+            <button id="btn-generate" type = "button">Generating</button>
+            <!-- <button id="btn-shapE">Cancel</button> -->
+            <button id="btn-area-generating" type="button">Area-Generating</button>
+            <!-- <button id="btn-shapE">Area</button> -->
+            <button id="btn-place" type = "button">Place</button>
+            <button id="btn-undo" type = "button">Undo</button>
+        </div>
+
+        <div id = "camera", class="module">
+            <button id ="btn-reset-camera" type = "button">Reset Camera</button>
+            <button id = "btn-play" type = "button">Play</button>
+        </div>
+        
+        <div id = "Abstraction", class="module">
+            <h2>Generation Progress</h2>
+            <label for="myRange-sculpting">Detail Level:</label>
+            <span id="sculpting-rangeValue">40</span>
+            <script>
+            function updateDetailLevel(value) {
+                document.getElementById('sculpting-rangeValue').textContent = value;
+            }
+            function toggleGenerationProgress(checkbox) {
+                const rangeSlider = document.getElementById('myRange-sculpting');
+                rangeSlider.disabled = !checkbox.checked; // Disable slider when checkbox is not checked
+                if (checkbox.checked) {
+                    console.log("Generation progress is ON");
+                    // Additional logic to start generation process
+                } else {
+                    console.log("Generation progress is OFF");
+                    // Additional logic to stop generation process
+                }
+            }
+            </script>
+            <input type="range" id="myRange-sculpting" name="range" min="10" max="40" step="10" value="40" oninput="updateDetailLevel(this.value)" disabled>
+            <br>
+            <label for="progress-toggle">Enable Progress:</label>
+            <input type="checkbox" id="progress-toggle" name="progress-toggle" onchange="toggleGenerationProgress(this)">
+        </div>
+
+        <!-- <div id="brush", class = "module" >
+            <h2>Mixing Brush</h2>
+            <p>Brush prompt 1:</p>
+            <textarea id="txt-brush-1" rows="1" cols="50">a wooden chair</textarea>
+            
+            <p>Brush prompt 2:</p>
+            <textarea id="txt-brush-2" rows="1" cols="50">a blue shark</textarea>
+        
+            <button id="btn-prompt-de" type = "button" onclick="promptDecomposition()">Decomposition</button>
+            <button id="btn-brush" type = "button">Brush</button>
+            <div id="brush-bar-1" style="display: none;">
+                <label for="material-slider">Value 1: Wooden ⇄ Blue</label>
+                <input type="range" id="material-slider" min="0" max="100" step="1" oninput="updateMaterial(this.value)">
+                <span id="materialValue">50%</span>
+            </div>
+        
+            <div id="brush-bar-2" style="display: none;">
+                <label for="object-slider">Object: Chair ⇄ Shark</label>
+                <input type="range" id="object-slider" min="0" max="100" step="1" oninput="updateObject(this.value)">
+                <span id="objectValue">50%</span>
+            </div>
+        </div> -->
+
+        
+        
+        <div id = "save", class="module">
+            <!-- <h2>Save</h2> -->
+            <button id="btn-save" type = "button">Save</button>
+        </div>
+
+        <script>
+        function promptDecomposition() {
+            // Show the control bars
+            document.getElementById('brush-bar-1').style.display = 'block';
+            document.getElementById('brush-bar-2').style.display = 'block';
+        
+            // Logic to decompose prompts and adjust sliders (to be implemented)
+        }
+        
+        function updateMaterial(value) {
+            // Update material transition based on slider value
+            document.getElementById('materialValue').textContent = value + '%';
+        }
+        
+        function updateObject(value) {
+            // Update object transition based on slider value
+            document.getElementById('objectValue').textContent = value + '%';
+        }
+        </script>
+        
+    </div>
+
+    <div id="viewer">
+        <div id="scene-name">Shap-Explorer 1.0 </div>
+        <!-- <div id="scene-label">[Operation]</div> -->
+    </div>
+    <div id="selection-box" style="border: 2px dashed #fff; position: absolute; pointer-events: none; display: none;"></div>
+    
+    <script type="module" src="app.js"></script>
+</body>
+</html>
