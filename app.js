@@ -3,7 +3,7 @@ import * as THREE from 'https://unpkg.com/three@0.127.0/build/three.module.js';
 import { PLYLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/PLYLoader.js';
 import axios from 'https://cdn.skypack.dev/axios';
 
-import { setupScene, animate, scene, renderer, camera} from './scripts/sceneSetup.js';
+import { setupScene, loadTemplatePLYtoMainScene, animate, scene, renderer, camera} from './scripts/sceneSetup.js';
 import {setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, currentMesh} from './scripts/setupPreviewer.js';
 import {controls} from './scripts/interactions.js';
 import {resetCamera, animateCameraAlongSpiral, rotateStairsDown, isAnimating} from './scripts/animateCamera.js';
@@ -89,6 +89,7 @@ function loadPLYtoMainScene(blobUrl, adjustFunction) {
     );
 }
 
+// Area selection functions
 let isSelectionModeActive = false;
 let isSelecting = false;
 let startPoint = { x: 0, y: 0 };
@@ -216,8 +217,6 @@ function getIntersectPoint(normalizedCoordinates) {
     }
     return null;
 }
-
-
 
 // Camera functions
 document.getElementById('btn-play').addEventListener('click', function() {
@@ -400,6 +399,26 @@ function updateMeshPosition(event) {
     }
 }
 
+// dropdown menu
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach an event listener to the scene-select dropdown
+    document.getElementById('scene-select').addEventListener('change', function() {
+        const sceneValue = this.value;
+        switch (sceneValue) {
+            case 'scene1':
+                loadTemplatePLYtoMainScene(0);
+                break;
+            case 'scene2':
+                loadTemplatePLYtoMainScene(1);
+                break;
+            case 'scene3':
+                loadTemplatePLYtoMainScene(2);
+                break;
+            default:
+                console.error('Invalid scene selection:', sceneValue);
+        }
+    });
+});
 
 
 

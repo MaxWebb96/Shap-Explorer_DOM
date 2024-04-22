@@ -6,7 +6,7 @@ import { PLYLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/
 const scene = new THREE.Scene();
 let camera, renderer;
 const viewerElement = document.getElementById('viewer');
-const sceneElement = document.getElementById('scene-select').value;
+
 
 function setupScene() {
     scene.background = new THREE.Color(0xaaaaaa);
@@ -42,7 +42,6 @@ function animate() {
 }
 
 function initScene() {
-    // Other scene setup like camera, lights, etc.
 
     // Create a large plane
     const planeGeometry = new THREE.PlaneGeometry(1000, 1000); // Adjust size as needed
@@ -57,31 +56,44 @@ function initScene() {
 
     // Add the plane to the scene
     scene.add(selectionPlane);
-    loadPLY();
+    loadTemplatePLYtoMainScene(0);
 }
 
-function loadPLY() {
-    const loader = new PLYLoader();
-    let path;
-    if (sceneElement === 'scene1') {
-        path = './model/spiralStairs.ply';
-    }
-    
-    loader.load(
 
-        path,
-        
+let templateMesh;
+function loadTemplatePLYtoMainScene(index = 0) {
+    const loader = new PLYLoader();
+    if (templateMesh) {
+        scene.remove(templateMesh);
+    }
+
+    const path = {
+        0: './model/spiralStairs.ply',
+        1: './model/a_shark.ply',
+        2: null
+    };
+
+    if (!path[index]) {
+        // no template
+        return;
+    }
+
+    loader.load(
+        path[index],
         (geometry) => {
-            geometry.computeVertexNormals();
+            console.log('Model loaded successfully:', path[index]);
+            if (geometry.computeVertexNormals()) {
+                geometry.computeVertexNormals();
+            }
             const material = new THREE.MeshStandardMaterial({ vertexColors: true });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.rotateX(-Math.PI / 2);
-            mesh.name = 'spiralStairs'; // Set a name for the mesh
-            scene.add(mesh);
+            templateMesh = new THREE.Mesh(geometry, material);
+            templateMesh.rotateX(-Math.PI / 2);
+            templateMesh.name = 'spiralStairs'; // Set a name for the mesh for animation purposes
+            scene.add(templateMesh);
         },
         undefined,
         (error) => console.error('An error happened:', error)
     );
 };
 
-export { setupScene, animate, scene, camera, renderer };
+export { setupScene, loadTemplatePLYtoMainScene, animate, scene, camera, renderer };
