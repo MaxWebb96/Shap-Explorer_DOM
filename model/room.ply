@@ -1,0 +1,51 @@
+ply
+format ascii 1.0
+comment File exported by Rhinoceros Version 7.0
+element vertex 12
+property float x
+property float y
+property float z
+property float nx
+property float ny
+property float nz
+property uchar red
+property uchar green
+property uchar blue
+element face 3
+property list uchar uint vertex_indices
+element material 1
+property uchar ambient_red
+property uchar ambient_green
+property uchar ambient_blue
+property uchar ambient_alpha
+property uchar diffuse_red
+property uchar diffuse_green
+property uchar diffuse_blue
+property uchar diffuse_alpha
+property uchar emissive_red
+property uchar emissive_green
+property uchar emissive_blue
+property uchar emissive_alpha
+property uchar specular_red
+property uchar specular_green
+property uchar specular_blue
+property uchar specular_alpha
+property double shine
+property double transparency
+end_header
+-20.6581993103027 -20.6611938476563 0 1 0 0 250 250 250
+-20.6581993103027 -20.6611938476563 38.0346832275391 1 0 0 250 250 250
+-20.6581993103027 17.3734912872314 0 1 0 0 250 250 250
+-20.6581993103027 17.3734912872314 38.0346832275391 1 0 0 250 250 250
+-20.6581993103027 17.3734912872314 0 0 -1 0 250 250 250
+-20.6581993103027 17.3734912872314 38.0346832275391 0 -1 0 250 250 250
+17.376485824585 17.3734912872314 0 0 -1 0 250 250 250
+17.376485824585 17.3734912872314 38.0346832275391 0 -1 0 250 250 250
+-20.6581993103027 -20.6611938476563 0 0 0 1 250 250 250
+-20.6581993103027 17.3734912872314 0 0 0 1 250 250 250
+17.376485824585 -20.6611938476563 0 0 0 1 250 250 250
+17.376485824585 17.3734912872314 0 0 0 1 250 250 250
+4 3 1 0 2
+4 7 5 4 6
+4 11 9 8 10
+0 0 0 255 250 250 250 255 0 0 0 255 255 255 255 255 0 0

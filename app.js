@@ -8,7 +8,6 @@ import {setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, currentMesh
 import {controls} from './scripts/interactions.js';
 import {resetCamera, animateCameraAlongSpiral, rotateStairsDown, isAnimating} from './scripts/animateCamera.js';
 // import {getCameraPosition, setCameraPosition, getCameraDirection, setCameraDirection, printCameraPosDir} from './scripts/helperFunction.js';
-
 // Initialize the scene
 setupScene(); 
 setupPreviewer();
@@ -39,7 +38,14 @@ async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
         const response = await axios.post('http://localhost:5000/convert', { 
             text: promptText, 
             guidance_scale: guidanceScale
-        }, { responseType: 'blob' });
+        }, { responseType: 'blob',
+            onDownloadProgress: function(progressEvent) {
+                const progressBar = document.getElementById('progressBar');
+                progressBar.value = (progressEvent.loaded / progressEvent.total) * 100;
+                console.log(`Progress: ${progressBar.value}%`); // Log progress to console
+            }
+            
+    });
         console.log('File received from server.');
 
         const blob = response.data;
@@ -419,9 +425,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-
-
-
-
-

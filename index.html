@@ -11,6 +11,13 @@
     <!-- <h1>Shap-Explorer</h1> -->
     <div id="toolbar">
         <div id="previewer" clas = 'module'></div>
+        <div>
+            <progress id="progressBar" value="0" max="100"></progress> <!-- Progress bar -->
+            <!-- <p id="progressText">0% Complete</p> Text to display the progress percentage -->
+            <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+            <script src="/scripts/socketIO.js"></script>
+            <!-- <button id = "startButton">Start Process</button> -->
+        </div>
         <div id = "shapE", class="module">
             <h2>Shap-E Generating</h2>
             <textarea id="prompt-text" rows="1" cols="50">a chair</textarea>
@@ -120,7 +127,7 @@
         <label for="scene-select">Select a scene:</label>
         <select id="scene-select">
             <option value="scene1">Eternal Ascent</option>
-            <option value="scene2">Bedroom</option>
+            <option value="scene2">Room</option>
             <option value="scene3">No Template</option>
         </select>
     </div>
@@ -132,5 +139,6 @@
     <div id="selection-box" style="border: 2px dashed #fff; position: absolute; pointer-events: none; display: none;"></div>
     
     <script type="module" src="app.js"></script>
+    
 </body>
 </html>

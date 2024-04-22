@@ -69,7 +69,7 @@ function loadTemplatePLYtoMainScene(index = 0) {
 
     const path = {
         0: './model/spiralStairs.ply',
-        1: './model/a_shark.ply',
+        1: './model/room.ply',
         2: null
     };
 
