@@ -4,7 +4,7 @@ import { PLYLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/
 import axios from 'https://cdn.skypack.dev/axios';
 
 import { setupScene, loadTemplatePLYtoMainScene, animate, scene, renderer, camera} from './scripts/sceneSetup.js';
-import {setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, currentMesh} from './scripts/setupPreviewer.js';
+import {setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, loadOBJFileToPreviewer, currentMesh} from './scripts/setupPreviewer.js';
 import {controls} from './scripts/interactions.js';
 import {resetCamera, animateCameraAlongSpiral, rotateStairsDown, isAnimating} from './scripts/animateCamera.js';
 import { saveFunction } from './scripts/saveFile.js';
@@ -430,4 +430,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // SAVE functions
 document.getElementById('btn-save').addEventListener('click', function() {
     saveFunction();
+});
+
+// Deform function
+document.getElementById('btn-deform').addEventListener('click', function() {
+    loadOBJFileToPreviewer(2);
 });

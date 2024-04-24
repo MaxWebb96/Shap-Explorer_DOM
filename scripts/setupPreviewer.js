@@ -123,11 +123,13 @@ function loadOBJFileToPreviewer(index = 0) {
     const objPath = {
         0: './model/spot.obj',
         1: './model/mesh.obj',
+        2: './model/chair hand.obj',
     };
 
     const mtlPath = {
         0: './model/spot.mtl',
         1: './model/mesh.mtl',
+        2: './model/chair hand.mtl',
     };
 
     let objFilePath = objPath[index] || './model/spot.obj'; // Default path if index is out of defined keys
@@ -194,4 +196,4 @@ window.addEventListener('resize', onWindowResize);
 
 
 
-export { setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, currentMesh };
+export { setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, loadOBJFileToPreviewer, currentMesh };
