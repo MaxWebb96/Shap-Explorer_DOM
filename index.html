@@ -19,7 +19,7 @@
             <!-- <button id = "startButton">Start Process</button> -->
         </div>
         <div id = "shapE", class="module">
-            <h2>Generating</h2>
+            <h2>Mesh Generator</h2>
             <textarea id="prompt-text" rows="1" cols="50">a chair</textarea>
 
             <label for="myRange">Guidance scale:</label>
@@ -40,11 +40,15 @@
             <button id="btn-undo" type = "button">Undo</button>
         </div>
 
-        
-        
+        <div id = "text-deformer", class = "module">
+            <h2>Text Deformer</h2>
+            <textarea id="txt-deformer" rows="1" cols="50">a chair</textarea>
+            <button id="btn-deform" type = "button">Deform</button>
+        </div>
+
         <div id = "Abstraction", class="module">
-            <h2>Generation Process Control</h2>
-            <label for="myRange-sculpting">Detail Level:</label>
+            <h2>Process Controller</h2>
+            <label for="myRange-sculpting">Steps:</label>
             <span id="sculpting-rangeValue">40</span>
             <script>
             function updateDetailLevel(value) {
