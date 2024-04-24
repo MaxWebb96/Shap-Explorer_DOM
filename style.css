@@ -134,21 +134,32 @@ input[type=range] {
     border-radius: 5px;
     font-size: 26px;
 }
+
 #scene-label {
     position: absolute;
     top: 60px; /* Adjust as needed */
     left: 10px; /* Adjust as needed */
-    color: #fff; /* Choose a color that stands out against your scene */
-    background-color: rgba(0, 0, 0, 0.5); /* Optional: for better readability */
+    color: #000000; /* Choose a color that stands out against your scene */
+    /* background-color: rgba(255, 255, 255, 0.5); Optional: for better readability */
     padding: 5px;
     border-radius: 5px;
     font-size: 16px; /* Adjust size as needed */
+    margin-top: 5px;
 }
 
 #scene-label i {
     margin-right: 5px;
     color: #f8eba3fa;  /* Golden color */
-  }
+}
+
+#scene-label img {
+    margin-left: 5px;
+    margin-top: 0px;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    /* color: #f8eba3fa */
+}
 
 #scene-dropdown{
     position: absolute;
