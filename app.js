@@ -322,6 +322,7 @@ function handleMeshPlacementClick(event) {
     }
 }
 
+let axesHelper;
 function placeMeshInMainScene(currentMesh) {
     if (!currentMesh) {
         console.error("No mesh is currently loaded in the previewer.");
@@ -341,12 +342,46 @@ function placeMeshInMainScene(currentMesh) {
     currentBoundingBoxHelper = new THREE.BoxHelper(temporaryMesh, 0xff0000);
     scene.add(currentBoundingBoxHelper);
 
+    // Custom Axes Helper with both positive and negative axes
+    const axesSize = 50; // Define the size of the axes
+    axesHelper = new THREE.Group();
+
+    // Red line for the X axis
+    const materialX = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const geometryX = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-axesSize, 0, 0), new THREE.Vector3(axesSize, 0, 0)
+    ]);
+    const xAxis = new THREE.Line(geometryX, materialX);
+    axesHelper.add(xAxis);
+
+    // Green line for the Y axis
+    const materialY = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    const geometryY = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, -axesSize, 0), new THREE.Vector3(0, axesSize, 0)
+    ]);
+    const yAxis = new THREE.Line(geometryY, materialY);
+    axesHelper.add(yAxis);
+
+    // Blue line for the Z axis
+    const materialZ = new THREE.LineBasicMaterial({ color: 0x0000ff });
+    const geometryZ = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, -axesSize), new THREE.Vector3(0, 0, axesSize)
+    ]);
+    const zAxis = new THREE.Line(geometryZ, materialZ);
+    axesHelper.add(zAxis);
+
+    // Add the custom axes helper to the scene instead of the mesh
+    axesHelper.position.copy(temporaryMesh.position);
+    axesHelper.rotation.copy(temporaryMesh.rotation);
+    scene.add(axesHelper);
+
     isSettingXY = true;
 }
 
 function finalizeMeshPlacement(event) {
     console.log("Finalizing mesh placement in the scene");
     scene.remove(currentBoundingBoxHelper);
+    scene.remove(axesHelper);
 
     isSettingXY = false;
     isSettingZ = false;
@@ -403,6 +438,11 @@ function updateMeshPosition(event) {
     }
     if (currentBoundingBoxHelper) {
         currentBoundingBoxHelper.update();
+    }
+
+    if (axesHelper && temporaryMesh) {
+        axesHelper.position.copy(temporaryMesh.position);
+        axesHelper.rotation.copy(temporaryMesh.rotation);
     }
 }
 
