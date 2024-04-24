@@ -27,8 +27,8 @@ function setupPreviewer() {
     directionalLight.position.set(1, 1, 1);
     previewScene.add(directionalLight);
 
-    // loadPLYFileToPreviewer(); // Load the PLY file
-    loadOBJFileToPreviewer(0);
+    loadPLYFileToPreviewer(); // Load the PLY file
+    // loadOBJFileToPreviewer(0);
 }
 
 let angle = 0; // Initialize angle for rotation
