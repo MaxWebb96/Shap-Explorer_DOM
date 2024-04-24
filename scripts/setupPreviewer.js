@@ -1,6 +1,8 @@
 // manage previewer for 3D model
 import * as THREE from 'https://unpkg.com/three@0.127.0/build/three.module.js';
 import { PLYLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/PLYLoader.js';
+import { OBJLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/MTLLoader.js';
 
 let previewScene, previewCamera, previewRenderer;
 let currentMesh;
@@ -25,11 +27,13 @@ function setupPreviewer() {
     directionalLight.position.set(1, 1, 1);
     previewScene.add(directionalLight);
 
-    loadPLYFileToPreviewer(); // Load the PLY file
+    // loadPLYFileToPreviewer(); // Load the PLY file
+    loadOBJFileToPreviewer(0);
 }
 
 let angle = 0; // Initialize angle for rotation
 let isAnimating = false;
+
 function animatePreviewer() {
     if (!isAnimating) {
         isAnimating = true;
@@ -37,7 +41,7 @@ function animatePreviewer() {
     }
     requestAnimationFrame(animatePreviewer);
 
-    if (currentMesh) {
+    if (currentMesh && currentMesh.geometry) {
         // Compute the bounding box only if it hasn't been computed or if the mesh changes
         if (!currentMesh.geometry.boundingBox) {
             currentMesh.geometry.computeBoundingBox();
@@ -62,10 +66,13 @@ function animatePreviewer() {
         previewCamera.lookAt(center); // Camera now looks at the center of the bounding box
     } else {
         console.log('No mesh to rotate.');
+        previewCamera.position.set(3, 0, 0); // Reset the camera position
+        previewCamera.lookAt(0, 0, 0); // Reset the camera lookAt
     }
 
     previewRenderer.render(previewScene, previewCamera);
 }
+
 
 function loadPLYFileToPreviewer(index = 0) {
     if (currentMesh) {
@@ -105,6 +112,61 @@ function loadPLYFileToPreviewer(index = 0) {
         (error) => console.error('An error happened:', error)
     );
 };
+
+function loadOBJFileToPreviewer(index = 0) {
+    if (currentMesh) {
+        previewScene.remove(currentMesh);
+        if (currentMesh.geometry) currentMesh.geometry.dispose();
+        if (currentMesh.material) currentMesh.material.dispose();
+    }
+
+    const objPath = {
+        0: './model/spot.obj',
+        1: './model/mesh.obj',
+    };
+
+    const mtlPath = {
+        0: './model/spot.mtl',
+        1: './model/mesh.mtl',
+    };
+
+    let objFilePath = objPath[index] || './model/spot.obj'; // Default path if index is out of defined keys
+    let mtlFilePath = mtlPath[index] || './model/spot.mtl'; // Default material file path
+
+    const mtlLoader = new MTLLoader();
+    mtlLoader.load(mtlFilePath, (materials) => {
+        materials.preload();
+        const objLoader = new OBJLoader();
+        objLoader.setMaterials(materials);
+        objLoader.load(
+            objFilePath,
+            (object) => {
+                console.log('Model loaded successfully:', objFilePath);
+                object.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        // Check if materials exist, else assign a default
+                        if (!child.material) {
+                            child.material = new THREE.MeshStandardMaterial({ color: 0x555555 });
+                        }
+                        if (!child.geometry.attributes.normal) {
+                            child.geometry.computeVertexNormals();
+                        }
+                    }
+                });
+                
+                object.name = 'default';
+                object.position.set(0, 0, 0);
+                previewScene.add(object);
+                currentMesh = object;
+                if (!isAnimating) animatePreviewer();
+            },
+            undefined,
+            (error) => console.error('An error happened loading the OBJ:', error)
+        );
+    }, (error) => console.error('An error happened loading the MTL:', error));
+}
+
+
 
 function LoadMeshToPreviewer(mesh) {
     if (currentMesh) {
