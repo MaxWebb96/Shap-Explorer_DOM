@@ -145,6 +145,11 @@ input[type=range] {
     font-size: 16px; /* Adjust size as needed */
 }
 
+#scene-label i {
+    margin-right: 5px;
+    color: #f8eba3fa;  /* Golden color */
+  }
+
 #scene-dropdown{
     position: absolute;
     bottom: 10px; /* Adjust as needed */
