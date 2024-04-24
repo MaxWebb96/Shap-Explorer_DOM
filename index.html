@@ -19,7 +19,7 @@
             <!-- <button id = "startButton">Start Process</button> -->
         </div>
         <div id = "shapE", class="module">
-            <h2>Shap-E Generating</h2>
+            <h2>Generating</h2>
             <textarea id="prompt-text" rows="1" cols="50">a chair</textarea>
 
             <label for="myRange">Guidance scale:</label>
@@ -40,13 +40,10 @@
             <button id="btn-undo" type = "button">Undo</button>
         </div>
 
-        <div id = "camera", class="module">
-            <button id ="btn-reset-camera" type = "button">Reset Camera</button>
-            <button id = "btn-play" type = "button">Play</button>
-        </div>
+        
         
         <div id = "Abstraction", class="module">
-            <h2>Generation Progress</h2>
+            <h2>Generation Process Control</h2>
             <label for="myRange-sculpting">Detail Level:</label>
             <span id="sculpting-rangeValue">40</span>
             <script>
@@ -67,8 +64,13 @@
             </script>
             <input type="range" id="myRange-sculpting" name="range" min="10" max="40" step="10" value="40" oninput="updateDetailLevel(this.value)" disabled>
             <br>
-            <label for="progress-toggle">Enable Progress:</label>
+            <label for="progress-toggle">Enable Process control</label>
             <input type="checkbox" id="progress-toggle" name="progress-toggle" onchange="toggleGenerationProgress(this)">
+        </div>
+
+        <div id = "camera", class="module">
+            <button id ="btn-reset-camera" type = "button">Reset Camera</button>
+            <button id = "btn-play" type = "button">Play</button>
         </div>
 
         <!-- <div id="brush", class = "module" >
