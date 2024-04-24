@@ -7,6 +7,7 @@ import { setupScene, loadTemplatePLYtoMainScene, animate, scene, renderer, camer
 import {setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, currentMesh} from './scripts/setupPreviewer.js';
 import {controls} from './scripts/interactions.js';
 import {resetCamera, animateCameraAlongSpiral, rotateStairsDown, isAnimating} from './scripts/animateCamera.js';
+import { saveFunction } from './scripts/saveFile.js';
 // import {getCameraPosition, setCameraPosition, getCameraDirection, setCameraDirection, printCameraPosDir} from './scripts/helperFunction.js';
 // Initialize the scene
 setupScene(); 
@@ -424,4 +425,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Invalid scene selection:', sceneValue);
         }
     });
+});
+
+// SAVE functions
+document.getElementById('btn-save').addEventListener('click', function() {
+    saveFunction();
 });
