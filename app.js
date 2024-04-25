@@ -57,15 +57,43 @@ function addPromptToUI(promptData) {
 async function processQueue() {
     if (promptQueue.length > 0 && !isProcessingPrompt) {
         isProcessingPrompt = true;
+        setIndeterminate(true);
         const prompt = promptQueue.shift();
         console.log('Processing prompt:', prompt);
         updatePromptStatus(prompt, 'Processing');
-        await loadPLYFromAPI(prompt.text, prompt.guidance_scale, (url) => {
-            loadPLYtoPreviewer(url, prompt);
-        });
+        // await loadPLYFromAPI(prompt.text, prompt.guidance_scale, (url) => {
+        //     loadPLYtoPreviewer(url, prompt);
+        // });
+        try {
+            await loadPLYFromAPI(prompt.text, prompt.guidance_scale, (url) => {
+                loadPLYtoPreviewer(url, prompt, () => {
+                    // Callback function to execute after model is loaded and previewed
+                    isProcessingPrompt = false;
+                    setIndeterminate(false); // Stop the indeterminate progress bar once done
+                    console.log('Model loaded and displayed.');
+                    updatePromptStatus(prompt, 'Completed', true);
+
+                    // Process the next item in the queue if available
+                    if (promptQueue.length > 0) {
+                        processQueue();
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Error during file generation/loading:', error);
+            isProcessingPrompt = false;
+            setIndeterminate(false); // Ensure progress bar is stopped in case of error
+            updatePromptStatus(prompt, 'Error', true);
+            // Process the next item in the queue if available
+            if (promptQueue.length > 0) {
+                processQueue();
+            }
+        }
     } else {
         console.log('Prompt queue is empty.');
-    }
+        setIndeterminate(false); // Ensure the progress bar is stopped when no more items to process
+    
+    } 
 }
 
 function updatePromptStatus(promptData, status, completed = false) {
@@ -109,7 +137,7 @@ function quickLoadandPlace(promptText, guidanceScale) {
 
 async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
     try {
-        setIndeterminate(true);
+    
         const response = await axios.post('http://localhost:5000/convert', { 
             text: promptText, 
             guidance_scale: guidanceScale
@@ -121,7 +149,6 @@ async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
             }
             
     });
-        setIndeterminate(false);
         console.log('File received from server.');
 
         const blob = response.data;
@@ -133,31 +160,32 @@ async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
     }
 }
 
-function loadPLYtoPreviewer(blobUrl,promptData, callback) {
+function loadPLYtoPreviewer(blobUrl, promptData, callback) {
     const loader = new PLYLoader();
     loader.load(
         blobUrl,
         (geometry) => {
-            geometry.computeVertexNormals();
+            geometry.computeVertexNormals();  // Ensure the geometry is ready for rendering
             const material = new THREE.MeshStandardMaterial({ vertexColors: true });
             const mesh = new THREE.Mesh(geometry, material);
-            mesh.rotateX(-Math.PI / 2);
+            mesh.rotateX(-Math.PI / 2);  // Adjust the orientation to fit the scene
 
-            LoadMeshToPreviewer(mesh);
+            LoadMeshToPreviewer(mesh);  // Assuming this function adds the mesh to the scene
             console.log("Model loaded and added to the previewer");
             updatePromptStatus(promptData, 'Completed', true);
-            isProcessingPrompt = false;
-            processQueue();
 
             if (typeof callback === 'function') {
-                callback();  // Execute the callback after the mesh is loaded and added
+                callback();  // Execute the callback to handle any post-load operations
             }
         },
         undefined,
         (error) => {
             console.error('An error happened:', error);
-            isProcessingPrompt = false;
-            processQueue();
+            updatePromptStatus(promptData, 'Error', true);  // Update the status to reflect the error
+
+            if (typeof callback === 'function') {
+                callback();  // Still execute the callback to ensure the queue continues processing
+            }
         }
     );
 }
