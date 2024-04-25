@@ -8,14 +8,16 @@ import {setupPreviewer, LoadMeshToPreviewer, loadPLYFileToPreviewer, loadOBJFile
 import {controls} from './scripts/interactions.js';
 import {resetCamera, animateCameraAlongSpiral, rotateStairsDown, isAnimating} from './scripts/animateCamera.js';
 import { saveFunction } from './scripts/saveFile.js';
+
 // import {getCameraPosition, setCameraPosition, getCameraDirection, setCameraDirection, printCameraPosDir} from './scripts/helperFunction.js';
 // Initialize the scene
 setupScene(); 
 setupPreviewer();
 animate();
-
 let meshStack = []; // Stack to keep track of loaded meshes --Undo function
-// Initialize the scene with a selection plane
+
+let promptQueue = [];
+let isProcessingPrompt = false;
 document.addEventListener('DOMContentLoaded', function() {
     const btnGenerate = document.getElementById('btn-generate');
     const btnAreaGenerating = document.getElementById('btn-area-generating');
@@ -24,7 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         const promptText = document.getElementById('prompt-text').value;
         const guidanceScale = document.getElementById('guidance-scale').value;
-        loadPLYFromAPI(promptText,guidanceScale, loadPLYtoPreviewer);
+
+        // push into the prompt queue
+        const promptData = {text: promptText, guidance_scale: guidanceScale};
+        promptQueue.push(promptData);
+        addPromptToUI(promptData);
+        // loadPLYFromAPI(promptText,guidanceScale, loadPLYtoPreviewer);
+
+        if (!isProcessingPrompt) {
+            processQueue();
+        }   
     });
 
     btnAreaGenerating.addEventListener('click', function() {
@@ -34,19 +45,83 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function addPromptToUI(promptData) {
+    const promptList = document.getElementById('prompt-list');
+    const promptItem = document.createElement('li');
+    const promptElementId = `prompt-${promptData.text}-${promptData.guidance_scale}`;
+    promptItem.textContent = `Prompt: ${promptData.text}, Scale: ${promptData.guidance_scale}`;
+    promptItem.id = promptElementId;
+    promptList.appendChild(promptItem);
+}
+
+async function processQueue() {
+    if (promptQueue.length > 0 && !isProcessingPrompt) {
+        isProcessingPrompt = true;
+        const prompt = promptQueue.shift();
+        console.log('Processing prompt:', prompt);
+        updatePromptStatus(prompt, 'Processing');
+        await loadPLYFromAPI(prompt.text, prompt.guidance_scale, (url) => {
+            loadPLYtoPreviewer(url, prompt);
+        });
+    } else {
+        console.log('Prompt queue is empty.');
+    }
+}
+
+function updatePromptStatus(promptData, status, completed = false) {
+    const promptElementId = `prompt-${promptData.text}-${promptData.guidance_scale}`;
+    const promptElement = document.getElementById(promptElementId);
+    if (!promptElement) {
+        console.error('Prompt element not found:', promptElementId);
+        return;
+    }
+    promptElement.textContent = `${status}: Prompt: ${promptData.text}, Scale: ${promptData.guidance_scale}`;
+
+    if (completed) {
+        const placeButton = document.createElement('button');
+        placeButton.textContent = 'Place';
+        placeButton.className = 'created-place-button';  // Apply CSS class
+        placeButton.onclick = function() {
+            quickLoadandPlace(promptData.text, promptData.guidance_scale);
+            
+            placeButton.disabled = true; // Optionally disable button after clicking
+            promptElement.remove()
+        };
+        promptElement.appendChild(placeButton);
+    }
+}
+
+function quickLoadandPlace(promptText, guidanceScale) {
+    loadPLYFromAPI(promptText, guidanceScale, (url) => {
+        // Load and preview the mesh, then check if a currentMesh is available and proceed
+        loadPLYtoPreviewer(url, {
+            text: promptText,
+            guidance_scale: guidanceScale
+        }, () => {
+            if (currentMesh) {  // Ensure there is a current mesh to work with
+                placeMeshInMainScene(currentMesh);
+                setupEventListeners();
+            }
+        });
+    });
+}
+ 
+
 async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
     try {
+        setIndeterminate(true);
         const response = await axios.post('http://localhost:5000/convert', { 
             text: promptText, 
             guidance_scale: guidanceScale
         }, { responseType: 'blob',
             onDownloadProgress: function(progressEvent) {
-                const progressBar = document.getElementById('progressBar');
-                progressBar.value = (progressEvent.loaded / progressEvent.total) * 100;
-                console.log(`Progress: ${progressBar.value}%`); // Log progress to console
+                // const progressBar = document.getElementById('progressBar');
+                // progressBar.value = (progressEvent.loaded / progressEvent.total) * 100;
+                // console.log(`Progress: ${progressBar.value}%`); // Log progress to console
             }
             
     });
+        setIndeterminate(false);
         console.log('File received from server.');
 
         const blob = response.data;
@@ -58,7 +133,7 @@ async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
     }
 }
 
-function loadPLYtoPreviewer(blobUrl) {
+function loadPLYtoPreviewer(blobUrl,promptData, callback) {
     const loader = new PLYLoader();
     loader.load(
         blobUrl,
@@ -67,12 +142,23 @@ function loadPLYtoPreviewer(blobUrl) {
             const material = new THREE.MeshStandardMaterial({ vertexColors: true });
             const mesh = new THREE.Mesh(geometry, material);
             mesh.rotateX(-Math.PI / 2);
+
             LoadMeshToPreviewer(mesh);
-            
             console.log("Model loaded and added to the previewer");
+            updatePromptStatus(promptData, 'Completed', true);
+            isProcessingPrompt = false;
+            processQueue();
+
+            if (typeof callback === 'function') {
+                callback();  // Execute the callback after the mesh is loaded and added
+            }
         },
         undefined,
-        (error) => console.error('An error happened:', error)
+        (error) => {
+            console.error('An error happened:', error);
+            isProcessingPrompt = false;
+            processQueue();
+        }
     );
 }
 
@@ -263,13 +349,13 @@ document.addEventListener('DOMContentLoaded', function () {
 document.getElementById('btn-place').addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    
     if (currentMesh) {  // Ensure there is a current mesh to work with
         placeMeshInMainScene(currentMesh);
         setupEventListeners();
     } else {
         console.error('No current mesh available for placement.');
     }
+    
 });
 
 function setupEventListeners() {
@@ -476,3 +562,13 @@ document.getElementById('btn-save').addEventListener('click', function() {
 document.getElementById('btn-deform').addEventListener('click', function() {
     loadOBJFileToPreviewer(2);
 });
+
+// Progress bar
+function setIndeterminate(isIndeterminate) {
+    const progressBar = document.getElementById('progressBar');
+    if (isIndeterminate) {
+        progressBar.removeAttribute('value'); // Remove the 'value' attribute to make it indeterminate
+    } else {
+        progressBar.setAttribute('value', '0'); // Reset the progress bar when not indeterminate
+    }
+}

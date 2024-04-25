@@ -168,8 +168,6 @@ function loadOBJFileToPreviewer(index = 0) {
     }, (error) => console.error('An error happened loading the MTL:', error));
 }
 
-
-
 function LoadMeshToPreviewer(mesh) {
     if (currentMesh) {
         previewScene.remove(currentMesh);
@@ -183,7 +181,6 @@ function LoadMeshToPreviewer(mesh) {
     previewScene.add(mesh);
     currentMesh = mesh;
     animatePreviewer();
-    
 };
 
 function onWindowResize() {

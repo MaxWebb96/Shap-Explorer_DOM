@@ -8,17 +8,17 @@
 </head>
 
 <body>
-    
+    <div id="temp-windows">
+        <div>
+            <progress id="progressBar" value="0" max="100"></progress> <!-- Progress bar -->
+        </div>
+        <ul id = "prompt-list"></ul>
+    </div>
+
     <!-- <h1>Shap-Explorer</h1> -->
     <div id="toolbar">
         <div id="previewer" clas = 'module'></div>
-        <div>
-            <progress id="progressBar" value="0" max="100"></progress> <!-- Progress bar -->
-            <!-- <p id="progressText">0% Complete</p> Text to display the progress percentage -->
-            <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-            <script src="/scripts/socketIO.js"></script>
-            <!-- <button id = "startButton">Start Process</button> -->
-        </div>
+        
         <div id = "shapE", class="module">
             <h2>Mesh Generator</h2>
             <textarea id="prompt-text" rows="1" cols="50">a chair</textarea>
