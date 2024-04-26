@@ -33,8 +33,12 @@ function setupPreviewer() {
 
 let angle = 0; // Initialize angle for rotation
 let isAnimating = false;
+let lastTime = 0;
 
-function animatePreviewer() {
+function animatePreviewer(timestamp) {
+    let deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+
     if (!isAnimating) {
         isAnimating = true;
         console.log('Animation started');
@@ -51,7 +55,7 @@ function animatePreviewer() {
         const center = boundingBox.getCenter(new THREE.Vector3());
 
         // Adjust the angle for rotation
-        angle += 0.005;
+        if(deltaTime) {angle += 0.008 * deltaTime / (1000/60);}
 
         // Calculate the camera distance
         const size = boundingBox.getSize(new THREE.Vector3());
@@ -169,19 +173,25 @@ function loadOBJFileToPreviewer(index = 0) {
 }
 
 function LoadMeshToPreviewer(mesh) {
-    if (currentMesh) {
-        previewScene.remove(currentMesh);
-    }
-    if (currentMesh.geometry) {
-        currentMesh.geometry.dispose();
-    }
-    if (currentMesh.material) {
-        currentMesh.material.dispose();
-    }
+    clearCurrentMesh();
     previewScene.add(mesh);
     currentMesh = mesh;
     animatePreviewer();
 };
+
+function clearCurrentMesh() {
+    if (currentMesh) {
+        if (currentMesh.geometry) currentMesh.geometry.dispose();
+        if (currentMesh.material) {
+            if (Array.isArray(currentMesh.material)) {
+                currentMesh.material.forEach(material => material.dispose());
+            } else {
+                currentMesh.material.dispose();
+            }
+        }
+        previewScene.remove(currentMesh);
+    }
+}
 
 function onWindowResize() {
     previewCamera.aspect = previewerElement.clientWidth / previewerElement.clientHeight;
