@@ -55,6 +55,12 @@ function addPromptToUI(promptData) {
 }
 
 async function processQueue() {
+    let generateProcess = false;
+    const generateProcessCheckbox = document.getElementById('progress-toggle');
+    if (generateProcessCheckbox && generateProcessCheckbox.checked) {
+        generateProcess = true;
+    }
+
     if (promptQueue.length > 0 && !isProcessingPrompt) {
         isProcessingPrompt = true;
         setIndeterminate(true);
@@ -65,7 +71,7 @@ async function processQueue() {
         //     loadPLYtoPreviewer(url, prompt);
         // });
         try {
-            await loadPLYFromAPI(prompt.text, prompt.guidance_scale, (url) => {
+            await loadPLYFromAPI(prompt.text, prompt.guidance_scale, generateProcess,(url) => {
                 loadPLYtoPreviewer(url, prompt, () => {
                     // Callback function to execute after model is loaded and previewed
                     isProcessingPrompt = false;
@@ -120,7 +126,7 @@ function updatePromptStatus(promptData, status, completed = false) {
 }
 
 function quickLoadandPlace(promptText, guidanceScale) {
-    loadPLYFromAPI(promptText, guidanceScale, (url) => {
+    loadPLYFromAPI(promptText, guidanceScale, false, (url) => {
         // Load and preview the mesh, then check if a currentMesh is available and proceed
         loadPLYtoPreviewer(url, {
             text: promptText,
@@ -135,30 +141,68 @@ function quickLoadandPlace(promptText, guidanceScale) {
 }
  
 
-async function loadPLYFromAPI(promptText, guidanceScale, loadFunction) {
+async function loadPLYFromAPI(promptText, guidanceScale, generateProcess = false, loadFunction) {
     try {
-    
         const response = await axios.post('http://localhost:5000/convert', { 
             text: promptText, 
-            guidance_scale: guidanceScale
-        }, { responseType: 'blob',
-            onDownloadProgress: function(progressEvent) {
-                // const progressBar = document.getElementById('progressBar');
-                // progressBar.value = (progressEvent.loaded / progressEvent.total) * 100;
-                // console.log(`Progress: ${progressBar.value}%`); // Log progress to console
-            }
-            
-    });
+            guidance_scale: guidanceScale,
+            generate_process: generateProcess
+        }, { responseType: 'blob'});
+
+        console.log('File received from server.');
+
+        const blob = response.data;
+        const url = URL.createObjectURL(blob);
+        loadFunction(url);
+
+    } catch (error) {
+        console.error('Error during file generation:', error);
+        throw error;
+    }
+}
+
+async function loadFileFromServer(filename, loadFunction) {
+    try {
+        const encodedFilename = encodeURIComponent(filename);
+        const response = await axios.get(`http://localhost:5000/get-file/${encodedFilename}`, { responseType: 'blob' });
+
         console.log('File received from server.');
 
         const blob = response.data;
         const url = URL.createObjectURL(blob);
 
-        loadFunction(url);
+        loadFunction(url);  // Load the file using the provided function
     } catch (error) {
-        console.error('Error during file generation:', error);
+        console.error('Error retrieving file:', error);
     }
 }
+
+// Process Controller Slider
+document.addEventListener('DOMContentLoaded', function () {
+    const slider = document.getElementById('myRange-sculpting');
+    const promptInput = document.getElementById('prompt-text');  // Get the input element, not just the value
+    const guidanceScaleInput = document.getElementById('guidance-scale'); // Same here
+
+    slider.addEventListener('input', function () {
+        updateDetailLevel(this.value);
+        const stepValues = [4, 8, 16, 32, 64]
+        let steps = stepValues[this.value];
+        // Ensure values are read at the time of the event, not just once on load
+        const prompt = promptInput.value;
+        const guidanceScale = guidanceScaleInput.value;
+        
+        // Create the filename using template literals
+        let fileName
+        if (steps === 64) {
+            fileName = `${prompt}_${guidanceScale}.ply`;
+        } else {
+            fileName = `${prompt}_${guidanceScale}_${steps}.ply`;
+        }
+        
+        // Call the loadFileFromServer function with the dynamically created filename
+        loadFileFromServer(fileName, loadPLYtoPreviewer);
+    });
+});
 
 function loadPLYtoPreviewer(blobUrl, promptData, callback) {
     const loader = new PLYLoader();
@@ -364,14 +408,7 @@ function undoLastAction() {
     }
 }
 
-// Detail level slider
-document.addEventListener('DOMContentLoaded', function () {
-    const slider = document.getElementById('myRange-sculpting');
-    slider.addEventListener('input', function () {
-        updateDetailLevel(this.value);
-        loadPLYFileToPreviewer(this.value);
-    });
-});
+
 
 // Place function
 document.getElementById('btn-place').addEventListener('click', (event) => {
@@ -600,3 +637,4 @@ function setIndeterminate(isIndeterminate) {
         progressBar.setAttribute('value', '0'); // Reset the progress bar when not indeterminate
     }
 }
+

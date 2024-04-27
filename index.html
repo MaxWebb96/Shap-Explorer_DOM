@@ -41,32 +41,34 @@
             <button id="btn-undo" type = "button">Undo</button>
         </div>
 
-       
-
         <div id = "Abstraction", class="module">
-            <h2>Process Controller</h2>
+            <h2>Process Controller<input type="checkbox" id="progress-toggle" name="progress-toggle" onchange="toggleGenerationProgress(this)"></h2>
             <label for="myRange-sculpting">Steps:</label>
-            <span id="sculpting-rangeValue">40</span>
+            <span id="sculpting-rangeValue">64</span>
             <script>
-            function updateDetailLevel(value) {
+                const stepValues = [4, 8, 16, 32, 64];
+            function updateDetailLevel(index) {
+                const value = stepValues[index];
                 document.getElementById('sculpting-rangeValue').textContent = value;
             }
             function toggleGenerationProgress(checkbox) {
                 const rangeSlider = document.getElementById('myRange-sculpting');
+                const generateButton = document.getElementById('btn-generate');
                 rangeSlider.disabled = !checkbox.checked; // Disable slider when checkbox is not checked
                 if (checkbox.checked) {
                     console.log("Generation progress is ON");
-                    // Additional logic to start generation process
+                    generateButton.textContent = 'Generating Process';
+                    generateButton.style.backgroundColor = '#ff6347'; // Red
+                    generateButton.style.color = '#ffffff'; // White text
                 } else {
                     console.log("Generation progress is OFF");
-                    // Additional logic to stop generation process
+                    generateButton.textContent = 'Generating';
+                    generateButton.style.backgroundColor = ''; // Default or any color
+                    generateButton.style.color = ''; // Default text color
                 }
             }
             </script>
-            <input type="range" id="myRange-sculpting" name="range" min="10" max="40" step="10" value="40" oninput="updateDetailLevel(this.value)" disabled>
-            <br>
-            <label for="progress-toggle">Enable Process control</label>
-            <input type="checkbox" id="progress-toggle" name="progress-toggle" onchange="toggleGenerationProgress(this)">
+            <input type="range" id="myRange-sculpting" name="range" min="0" max="4" step="1" value="4" oninput="updateDetailLevel(this.value)" disabled>
         </div>
 
         <div id = "text-deformer", class = "module">
@@ -102,8 +104,6 @@
                 <span id="objectValue">50%</span>
             </div>
         </div> -->
-
-        
         
         <div id = "save", class="module">
             <!-- <h2>Save</h2> -->
