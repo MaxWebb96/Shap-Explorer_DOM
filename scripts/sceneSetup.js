@@ -7,6 +7,8 @@ const scene = new THREE.Scene();
 let camera, renderer;
 const viewerElement = document.getElementById('viewer');
 
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+
 
 function setupScene() {
     scene.background = new THREE.Color(0xaaaaaa);
@@ -95,5 +97,18 @@ function loadTemplatePLYtoMainScene(index = 0) {
         (error) => console.error('An error happened:', error)
     );
 };
+
+function setCubeTexture() {
+    const texture = cubeTextureLoader.load([
+        './textures/cube/px.png',
+        './textures/cube/nx.png',
+        './textures/cube/py.png',
+        './textures/cube/ny.png',
+        './textures/cube/pz.png',
+        './textures/cube/nz.png',
+    ]);
+    scene.background = texture;
+}
+
 
 export { setupScene, loadTemplatePLYtoMainScene, animate, scene, camera, renderer };
