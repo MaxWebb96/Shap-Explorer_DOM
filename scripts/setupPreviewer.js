@@ -152,7 +152,7 @@ function loadOBJFileToPreviewer(index = 0) {
                     if (child instanceof THREE.Mesh) {
                         // Check if materials exist, else assign a default
                         if (!child.material) {
-                            child.material = new THREE.MeshStandardMaterial({ color: 0x555555 });
+                            child.material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
                         }
                         if (!child.geometry.attributes.normal) {
                             child.geometry.computeVertexNormals();
@@ -173,10 +173,15 @@ function loadOBJFileToPreviewer(index = 0) {
 }
 
 function LoadMeshToPreviewer(mesh) {
+    if (!mesh) {
+        console.error('No mesh to load.');
+        return;
+    }
     clearCurrentMesh();
     previewScene.add(mesh);
     currentMesh = mesh;
     animatePreviewer();
+        
 };
 
 function clearCurrentMesh() {

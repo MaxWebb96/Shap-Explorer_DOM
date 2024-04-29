@@ -1,5 +1,6 @@
 import * as THREE from 'https://unpkg.com/three@0.127.0/build/three.module.js';
-// import { OBJLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/MTLLoader.js';
 import { PLYLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/PLYLoader.js';
 import axios from 'https://cdn.skypack.dev/axios';
 
@@ -232,6 +233,34 @@ function loadPLYtoPreviewer(blobUrl, promptData, callback) {
             }
         }
     );
+}
+
+function loadOBJtoPreviewer(blobObjUrl) {
+    const objLoader = new OBJLoader();
+
+    // Load OBJ file from a blob URL
+    objLoader.load(
+        blobObjUrl,
+        (object) => {
+            console.log('Model loaded successfully from Blob URL');
+            object.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    // Assign a default material
+                    child.material = new THREE.MeshStandardMaterial({ color: 0xffffff }); // default color: white
+                }
+            });
+
+            object.rotateX(-Math.PI / 2)
+            // object.name = 'default';
+            object.position.set(0, 0, 0);
+            LoadMeshToPreviewer(object);
+            currentMesh = object;
+            if (!isAnimating) animatePreviewer();
+        },
+        undefined,
+        (error) => console.error('An error happened loading the OBJ from Blob URL:', error)
+    );
+    
 }
 
 function loadPLYtoMainScene(blobUrl, adjustFunction) {
@@ -625,7 +654,10 @@ document.getElementById('btn-save').addEventListener('click', function() {
 
 // Deform function
 document.getElementById('btn-deform').addEventListener('click', function() {
-    loadOBJFileToPreviewer(2);
+    // loadOBJFileToPreviewer(0);
+    const text = document.getElementById('txt-deformer').value;
+    const fileName = `${text}.obj`;
+    loadFileFromServer(fileName, loadOBJtoPreviewer);
 });
 
 // Progress bar
