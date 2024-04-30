@@ -523,7 +523,7 @@ function placeMeshInMainScene(currentMesh) {
     scene.add(currentBoundingBoxHelper);
 
     // Custom Axes Helper with both positive and negative axes
-    const axesSize = 50; // Define the size of the axes
+    const axesSize = 500; // Define the size of the axes
     axesHelper = new THREE.Group();
 
     // Red line for the X axis
@@ -610,7 +610,7 @@ function updateMeshPosition(event) {
             console.log('No intersection with Z plane.');
         }
     } else if (isScaling) {
-        let scaleChange = (mouse.y + 1) * 2;
+        let scaleChange = (mouse.y + 1) * 10;
         temporaryMesh.scale.set(initialScale * scaleChange, initialScale * scaleChange, initialScale * scaleChange);
     } else if (isRotating) {
         let rotationChange = (mouse.x + 1) * Math.PI;  // Rotation in radians
